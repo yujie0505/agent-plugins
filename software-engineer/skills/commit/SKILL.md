@@ -1,7 +1,6 @@
 ---
 name: commit
-description: Use this skill when the user requests to commit code or create a git commit. It performs file path sanity checks, runs security scans (gitleaks), generates a standardized commit message, and executes the commit after explicit user approval.
-version: 1.0.0
+description: Triggers when the user asks to "commit code", "save changes to git", or "create a commit". Use this skill to handle the entire safe commit workflow.
 tags: [git]
 ---
 
