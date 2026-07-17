@@ -11,7 +11,7 @@ When invoked (e.g., via `/commit`), you MUST execute the following workflow sequ
 ## Gotchas
 
 - **Never auto-stage files**: You MUST NOT automatically run `git add` for the user under any circumstances. Only work with what is already staged.
-- **Strict script usage**: You MUST use `scripts/execute-commit.sh` to execute the commit. Do NOT run `git commit` directly.
+- **Strict script usage**: You MUST use `scripts/create-commit.sh` to execute the commit. Do NOT run `git commit` directly.
 - **Do not bypass checks**: If the staging validation fails (e.g. exposed secrets or empty staging area), you MUST STOP and inform the user. Do not attempt to force the commit.
 
 ## Workflow
@@ -21,7 +21,7 @@ Progress:
 - [ ] **Step 1: Run Automated Checks**
   - Run the precondition check script: `scripts/check-preconditions.sh`
   - If it returns a non-zero exit code, STOP and inform the user.
-  - Run the validation script: `scripts/validate-staging.sh`
+  - Run the validation script: `scripts/check-staging.sh`
   - If it returns a non-zero exit code, STOP and inform the user.
   - Note the list of staged files output by the script.
 - [ ] **Step 2: Review File Paths**
@@ -38,7 +38,7 @@ Progress:
   - Present the draft to the user and discuss/refine it until you receive EXPLICIT approval to proceed.
 - [ ] **Step 5: Execute Commit**
   - Write the approved commit message to a temporary file named `.software-engineer-commit-message` using your file writing tool.
-  - Execute the commit script: `scripts/execute-commit.sh`
+  - Execute the commit script: `scripts/create-commit.sh`
   - The script will automatically read from the file and delete it after execution.
   - If execution fails, read the error, explain it to the user, and offer help to fix issues.
   - Report the final result to the user.

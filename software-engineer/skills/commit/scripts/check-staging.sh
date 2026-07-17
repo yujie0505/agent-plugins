@@ -6,7 +6,7 @@ VERBOSE=0
 for arg in "$@"; do
     case $arg in
         --help|-h)
-            echo "Usage: scripts/validate-staging.sh [OPTIONS]"
+            echo "Usage: scripts/check-staging.sh [OPTIONS]"
             echo ""
             echo "Checks the git staging area for files and runs security scans (gitleaks)."
             echo ""

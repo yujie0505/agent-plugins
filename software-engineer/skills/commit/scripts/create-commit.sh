@@ -10,7 +10,7 @@ trap 'rm -f "$COMMIT_FILE"' EXIT
 for arg in "$@"; do
     case $arg in
         --help|-h)
-            echo "Usage: scripts/execute-commit.sh [OPTIONS]"
+            echo "Usage: scripts/create-commit.sh [OPTIONS]"
             echo ""
             echo "Executes a git commit using the message from the fixed file path:"
             echo "  $COMMIT_FILE"
