@@ -19,6 +19,8 @@ When invoked (e.g., via `/commit`), you MUST execute the following workflow sequ
 Progress:
 
 - [ ] **Step 1: Run Automated Checks**
+  - Run the precondition check script: `scripts/check-preconditions.sh`
+  - If it returns a non-zero exit code, STOP and inform the user.
   - Run the validation script: `scripts/validate-staging.sh`
   - If it returns a non-zero exit code, STOP and inform the user.
   - Note the list of staged files output by the script.
@@ -35,6 +37,8 @@ Progress:
   - Generate a draft commit message based on the reviewed content.
   - Present the draft to the user and discuss/refine it until you receive EXPLICIT approval to proceed.
 - [ ] **Step 5: Execute Commit**
-  - Execute the commit by passing the approved message via stdin: `echo "<commit_message>" | scripts/execute-commit.sh`
+  - Write the approved commit message to a temporary file named `.software-engineer-commit-message` using your file writing tool.
+  - Execute the commit script: `scripts/execute-commit.sh`
+  - The script will automatically read from the file and delete it after execution.
   - If execution fails, read the error, explain it to the user, and offer help to fix issues.
   - Report the final result to the user.
