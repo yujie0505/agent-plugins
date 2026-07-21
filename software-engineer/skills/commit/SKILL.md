@@ -6,8 +6,6 @@ tags: [git]
 
 # Commit Workflow
 
-Execute this workflow sequentially:
-
 ## Gotchas
 
 - **No auto-stage**: NEVER run `git add`. Only work with already staged files.
@@ -30,6 +28,7 @@ Progress:
   - Review diffs for hardcoded secrets (API keys, passwords, tokens) missed by automated tools. STOP immediately if found.
 - [ ] **Step 4: Draft Commit Message**
   - Check `AGENTS.md` for formatting guidelines (if available).
+  - Explain the motivation. NEVER summarize the `git diff` (it already shows the "what").
   - Draft a message and write it to `.software-engineer-commit-message`.
   - Run `scripts/check-message.sh`. Revise and re-validate if it fails.
   - Present the valid draft to the user and await EXPLICIT approval.
