@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Triggers when the user asks to "commit code", "save changes to git", or "create a commit". Use this skill to handle the entire safe commit workflow.
+description: Use this skill when the user asks to "commit code", "save changes to git", or "create a commit", or to handle the safe commit workflow.
 tags: [git]
 ---
 
