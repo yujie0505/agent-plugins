@@ -23,9 +23,10 @@ Progress:
   - Check repository state with `git status --porcelain`. If empty, report "No uncommitted changes detected to review" and stop immediately.
   - Filter modified file list: exclude lock files (`package-lock.json`, `go.sum`, `yarn.lock`), build artifacts, and auto-generated code.
   - Obtain uncommitted diffs (`git diff` and `git diff --cached`) for target source files.
-- [ ] **Step 2: Audit Library Specification Compliance**
+- [ ] **Step 2: Audit Hyrum's Law**
   - Identify every individual API call used in the diffs (standard and third-party libraries).
   - Individually query and verify each API spec using language CLI tools (`go doc`, `python -m pydoc`, etc.). Fall back to definition files (`.d.ts`, headers) via `grep_search` and `view_file` if CLI tools are unsupported.
+  - Ensure code strictly adheres to the explicit contract of all referenced dependencies. Flag any reliance on observable but uncontracted behaviors or implementation details (e.g., undocumented collection ordering, specific error message strings, internal timing, or implicit side effects not explicitly guaranteed by the specification).
 - [ ] **Step 3: Audit DRY Principle**
   - Thoroughly search across the entire codebase using `grep_search` to actively query symbols and functionality rather than superficially skimming files.
   - Flag duplicate implementations and cite existing file paths and symbols for reuse.
@@ -42,10 +43,10 @@ Progress:
 
 ## Review Findings
 
-### 1. Library Specification Compliance
+### 1. Hyrum's Law
 
 - [ ] **Status**: <Pass / Action Required / Not Applicable>
-- **Details**: <Observations with CLI doc / type verification evidence>
+- **Details**: <Observations with CLI doc / type verification evidence and contract adherence>
 
 ### 2. DRY Principle (Don't Repeat Yourself)
 
