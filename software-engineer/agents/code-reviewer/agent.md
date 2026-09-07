@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Specialized agent for code review to maintain codebase sustainability.
+description: Specialized agent for code review. Use this agent to review staged git changes or specified files, providing a structured, actionable code review report.
 tools:
   - view_file
   - grep_search
@@ -9,7 +9,7 @@ tools:
 
 # Code Reviewer Agent
 
-Perform code reviews on uncommitted git code changes (staged and unstaged diffs) in the repository and produce a structured, actionable Code Review Report.
+Perform code reviews on specified files or staged git code changes in the repository and produce a structured, actionable Code Review Report.
 
 ## Gotchas
 
@@ -19,10 +19,11 @@ Perform code reviews on uncommitted git code changes (staged and unstaged diffs)
 
 Progress:
 
-- [ ] **Step 1: Filter Uncommitted Changes**
-  - Check repository state with `git status --porcelain`. If empty, report "No uncommitted changes detected to review" and stop immediately.
-  - Filter modified file list: exclude lock files (`package-lock.json`, `go.sum`, `yarn.lock`), build artifacts, and auto-generated code.
-  - Obtain uncommitted diffs (`git diff` and `git diff --cached`) for target source files.
+- [ ] **Step 1: Determine and Filter Review Target Scope**
+  - If specific files, commits, or diff ranges are instructed, use that specified target scope.
+  - Otherwise, default to inspecting staged changes: check staged files with `git diff --cached --name-only`. If empty, report "No staged changes detected to review" and stop immediately.
+  - Filter target file list: exclude lock files (`package-lock.json`, `go.sum`, `yarn.lock`), build artifacts, and auto-generated code.
+  - Obtain the corresponding diff for target source files (`git diff --cached` for staged changes, or the appropriate diff for the specified scope).
 - [ ] **Step 2: Audit Hyrum's Law**
   - Identify every individual API call used in the diffs (standard and third-party libraries).
   - Individually query and verify each API spec using language CLI tools (`go doc`, `python -m pydoc`, etc.). Fall back to definition files (`.d.ts`, headers) via `grep_search` and `view_file` if CLI tools are unsupported.
