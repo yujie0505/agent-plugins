@@ -8,6 +8,7 @@ tags: [git]
 
 ## Gotchas
 
+- **Script Resolution**: The helper scripts reside in the `scripts/` directory alongside this `SKILL.md`. When executing commands, resolve the script paths relative to this skill's directory (e.g. `<skill_directory>/scripts/<script_name>.sh`), NOT relative to the target repository's root.
 - **No auto-stage**: NEVER run `git add`. Only work with already staged files.
 - **Use scripts**: MUST use `scripts/create-commit.sh` instead of `git commit`.
 - **Enforce checks**: STOP and inform the user immediately if any script returns a non-zero exit code. Do not force commits.
