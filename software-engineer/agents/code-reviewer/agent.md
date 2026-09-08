@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Specialized agent for code review. Use this agent to review staged git changes or specified files, providing a structured, actionable code review report.
+description: Use this agent to review staged git changes or specified files, providing a structured, actionable code review report.
 tools:
   - find_by_name
   - grep_search
