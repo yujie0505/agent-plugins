@@ -17,7 +17,6 @@ Progress:
 
 - [ ] **Step 1: Run Automated Checks**
   - Run `scripts/check-staging.sh`. STOP and inform the user if it fails.
-  - Note the list of staged files.
 - [ ] **Step 2: Review File Paths**
   - Identify suspicious staged files (`*.log`, `.env`, `.DS_Store`, `dist/`, temporary files).
   - If found, ask the user to verify. If they choose to unstage, run `git restore --staged <file>` and restart this step.
@@ -26,10 +25,10 @@ Progress:
   - Review diffs for hardcoded secrets (API keys, passwords, tokens) missed by automated tools. STOP immediately if found.
 - [ ] **Step 4: Draft Commit Message**
   - Check `AGENTS.md` for formatting guidelines (if available).
-  - Explain the motivation. NEVER summarize the `git diff` (it already shows the "what").
+  - Focus on motivation; do not summarize the diff.
   - Draft a message and write it to a temporary file in the location used by the agent runtime for conversation temporary files. NEVER write temporary files into the target repository root.
   - Run `scripts/check-message.sh <path-to-commit-file>`. Revise and re-validate if it fails.
   - Present the valid draft to the user and await EXPLICIT approval.
 - [ ] **Step 5: Execute Commit**
-  - Run `scripts/create-commit.sh <path-to-commit-file>` instead of `git commit` directly.
+  - Run `scripts/create-commit.sh <path-to-commit-file>`.
   - Report success, or explain the error if it fails.
