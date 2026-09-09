@@ -1,35 +1,44 @@
 #!/bin/bash
 
 DRY_RUN=0
-COMMIT_FILE=".software-engineer-commit-message"
-
-# Set up atomic cleanup: ensures the file is removed upon script exit (success or failure)
-trap 'rm -f "$COMMIT_FILE"' EXIT
+COMMIT_FILE=""
 
 # Parse arguments
 for arg in "$@"; do
     case $arg in
         --help|-h)
-            echo "Usage: scripts/create-commit.sh [OPTIONS]"
+            echo "Usage: scripts/create-commit.sh [OPTIONS] <commit-message-file>"
             echo ""
-            echo "Executes a git commit using the message from the fixed file path:"
-            echo "  $COMMIT_FILE"
-            echo "The file will be automatically deleted after execution."
+            echo "Executes a git commit using the message from the specified file."
             echo ""
             echo "Options:"
             echo "  --dry-run    Preview the commit without actually creating it"
             echo ""
             echo "Exit codes:"
             echo "  0: Success"
-            echo "  2: Missing commit message file"
+            echo "  2: Missing or invalid commit message file"
             echo "  3: Git commit execution failed"
             exit 0
             ;;
         --dry-run)
             DRY_RUN=1
             ;;
+        *)
+            if [ -z "$COMMIT_FILE" ]; then
+                COMMIT_FILE="$arg"
+            else
+                echo "ERROR: Unexpected argument: $arg" >&2
+                exit 2
+            fi
+            ;;
     esac
 done
+
+if [ -z "$COMMIT_FILE" ]; then
+    echo "ERROR: Missing commit message file path." >&2
+    echo "Usage: scripts/create-commit.sh [OPTIONS] <commit-message-file>" >&2
+    exit 2
+fi
 
 if [ ! -f "$COMMIT_FILE" ]; then
     echo "ERROR: Commit message file '$COMMIT_FILE' not found." >&2

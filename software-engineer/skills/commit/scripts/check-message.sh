@@ -1,26 +1,41 @@
 #!/bin/bash
 
-COMMIT_FILE=".software-engineer-commit-message"
+COMMIT_FILE=""
 
 # Parse arguments
 for arg in "$@"; do
     case $arg in
         --help|-h)
-            echo "Usage: scripts/check-message.sh"
+            echo "Usage: scripts/check-message.sh <commit-message-file>"
             echo ""
-            echo "Validates the commit message in $COMMIT_FILE using commitlint."
+            echo "Validates the commit message in the specified file using commitlint."
             echo ""
             echo "Exit codes:"
             echo "  0: Success (or skipped if commitlint is missing)"
             echo "  1: Validation failed"
+            echo "  2: Missing or invalid file argument"
             exit 0
+            ;;
+        *)
+            if [ -z "$COMMIT_FILE" ]; then
+                COMMIT_FILE="$arg"
+            else
+                echo "ERROR: Unexpected argument: $arg" >&2
+                exit 2
+            fi
             ;;
     esac
 done
 
+if [ -z "$COMMIT_FILE" ]; then
+    echo "ERROR: Missing commit message file path." >&2
+    echo "Usage: scripts/check-message.sh <commit-message-file>" >&2
+    exit 2
+fi
+
 if [ ! -f "$COMMIT_FILE" ]; then
     echo "ERROR: Commit message file '$COMMIT_FILE' not found." >&2
-    exit 1
+    exit 2
 fi
 
 if ! command -v commitlint >/dev/null 2>&1; then
