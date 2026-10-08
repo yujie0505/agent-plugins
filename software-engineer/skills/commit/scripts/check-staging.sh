@@ -62,8 +62,8 @@ fi
 echo "SUCCESS: Staging area validation passed." >&2
 
 # Output structured data to stdout (with predictable output size)
-STAGED_FILES=$(git diff --cached --name-only)
-FILE_COUNT=$(echo "$STAGED_FILES" | wc -l | tr -d ' ')
+STAGED_FILES=$(git -c core.quotepath=false diff --cached --name-only)
+FILE_COUNT=$(echo "$STAGED_FILES" | wc -l | tr -d '[:space:]')
 
 if [ "$VERBOSE" -eq 1 ] || [ "$FILE_COUNT" -le 50 ]; then
     echo "$STAGED_FILES"

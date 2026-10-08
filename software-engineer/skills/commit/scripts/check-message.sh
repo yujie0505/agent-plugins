@@ -10,6 +10,10 @@ for arg in "$@"; do
             echo ""
             echo "Validates the commit message in the specified file using commitlint."
             echo ""
+            echo "Output:"
+            echo "  - stdout: None"
+            echo "  - stderr: Validation diagnostics and results."
+            echo ""
             echo "Exit codes:"
             echo "  0: Success"
             echo "  1: Validation failed"
@@ -27,6 +31,7 @@ for arg in "$@"; do
                 COMMIT_FILE="$arg"
             else
                 echo "ERROR: Unexpected argument: $arg" >&2
+                echo "Usage: scripts/check-message.sh <commit-message-file>" >&2
                 exit 2
             fi
             ;;
@@ -41,6 +46,11 @@ fi
 
 if [ ! -f "$COMMIT_FILE" ]; then
     echo "ERROR: Commit message file '$COMMIT_FILE' not found." >&2
+    exit 2
+fi
+
+if [ ! -s "$COMMIT_FILE" ]; then
+    echo "ERROR: Commit message file '$COMMIT_FILE' is empty." >&2
     exit 2
 fi
 
