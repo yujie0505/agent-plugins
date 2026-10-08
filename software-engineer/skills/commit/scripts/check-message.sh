@@ -11,10 +11,16 @@ for arg in "$@"; do
             echo "Validates the commit message in the specified file using commitlint."
             echo ""
             echo "Exit codes:"
-            echo "  0: Success (or skipped if commitlint is missing)"
+            echo "  0: Success"
             echo "  1: Validation failed"
             echo "  2: Missing or invalid file argument"
+            echo "  10: commitlint is not installed (validation skipped)"
             exit 0
+            ;;
+        -*)
+            echo "ERROR: Unexpected option: $arg" >&2
+            echo "Usage: scripts/check-message.sh <commit-message-file>" >&2
+            exit 2
             ;;
         *)
             if [ -z "$COMMIT_FILE" ]; then
@@ -40,21 +46,10 @@ fi
 
 if ! command -v commitlint >/dev/null 2>&1; then
     echo "WARNING: commitlint is not installed. Skipping automated commitlint validation. Please proceed with manual inspection." >&2
-    exit 0
+    exit 10
 fi
 
-# Attempt to lint assuming a local config might exist
-commitlint --edit "$COMMIT_FILE" >&2
-EXIT_CODE=$?
-
-# If commitlint fails with code 9 (indicating missing configuration rules)
-if [ $EXIT_CODE -eq 9 ]; then
-    echo "WARNING: Local commitlint config not found or invalid (exit code 9). Falling back to default config..." >&2
-    commitlint --edit "$COMMIT_FILE" --default-config >&2
-    EXIT_CODE=$?
-fi
-
-if [ $EXIT_CODE -ne 0 ]; then
+if ! commitlint --edit "$COMMIT_FILE" --default-config >&2; then
     echo "ERROR: commitlint validation failed. Please revise the commit message." >&2
     exit 1
 fi

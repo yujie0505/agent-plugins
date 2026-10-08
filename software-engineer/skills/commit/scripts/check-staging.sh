@@ -19,23 +19,36 @@ for arg in "$@"; do
             echo ""
             echo "Exit codes:"
             echo "  0: Success"
+            echo "  1: Invalid arguments"
             echo "  2: No staged files found"
             echo "  3: gitleaks detected exposed secrets"
+            echo "  4: Not a git repository"
             exit 0
             ;;
         --verbose)
             VERBOSE=1
             ;;
+        *)
+            echo "ERROR: Unexpected argument: $arg" >&2
+            echo "Usage: scripts/check-staging.sh [OPTIONS]" >&2
+            exit 1
+            ;;
     esac
 done
 
-# 1. Check if staging area is empty
+# 1. Check if inside git work tree
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "ERROR: Not a git repository (or any of the parent directories)." >&2
+    exit 4
+fi
+
+# 2. Check if staging area is empty
 if git diff --cached --quiet; then
     echo "ERROR: No staged files found. Please stage your files first." >&2
     exit 2
 fi
 
-# 2. Security Check with gitleaks
+# 3. Security Check with gitleaks
 if command -v gitleaks >/dev/null 2>&1; then
     if ! gitleaks git --pre-commit --redact --staged --verbose >&2; then
         echo "ERROR: gitleaks detected exposed secrets. Please review and remove them." >&2
@@ -45,7 +58,7 @@ else
     echo "WARNING: gitleaks is not installed. Skipping automated security scan. Please proceed with manual inspection." >&2
 fi
 
-# 3. Output staged files for agent's manual review
+# 4. Output staged files for agent's manual review
 echo "SUCCESS: Staging area validation passed." >&2
 
 # Output structured data to stdout (with predictable output size)

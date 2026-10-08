@@ -16,6 +16,7 @@ for arg in "$@"; do
             echo ""
             echo "Exit codes:"
             echo "  0: Success"
+            echo "  1: Unexpected argument or option"
             echo "  2: Missing or invalid commit message file"
             echo "  3: Git commit execution failed"
             exit 0
@@ -23,12 +24,17 @@ for arg in "$@"; do
         --dry-run)
             DRY_RUN=1
             ;;
+        -*)
+            echo "ERROR: Unexpected option: $arg" >&2
+            echo "Usage: scripts/create-commit.sh [OPTIONS] <commit-message-file>" >&2
+            exit 1
+            ;;
         *)
             if [ -z "$COMMIT_FILE" ]; then
                 COMMIT_FILE="$arg"
             else
                 echo "ERROR: Unexpected argument: $arg" >&2
-                exit 2
+                exit 1
             fi
             ;;
     esac
@@ -46,10 +52,14 @@ if [ ! -f "$COMMIT_FILE" ]; then
 fi
 
 if [ "$DRY_RUN" -eq 1 ]; then
-    echo "DRY RUN: The following commit message would be used:" >&2
+    echo "DRY RUN: Testing commit execution with message from $COMMIT_FILE:" >&2
     echo "---" >&2
     cat "$COMMIT_FILE" >&2
     echo "---" >&2
+    if ! git commit --dry-run -F "$COMMIT_FILE" >&2; then
+        echo "ERROR: Dry run failed (staged changes or commit configuration error)." >&2
+        exit 3
+    fi
     echo "SUCCESS: Dry run complete. No commit was created." >&2
     exit 0
 fi
@@ -58,3 +68,5 @@ if ! git commit -F "$COMMIT_FILE"; then
     echo "ERROR: Failed to execute git commit." >&2
     exit 3
 fi
+
+git rev-parse --short HEAD
