@@ -3,7 +3,6 @@
 DRY_RUN=0
 COMMIT_FILE=""
 
-# Parse arguments
 for arg in "$@"; do
     case $arg in
         --help|-h)
@@ -63,13 +62,11 @@ if [ ! -s "$COMMIT_FILE" ]; then
     exit 2
 fi
 
-# 1. Check if inside git work tree
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "ERROR: Not a git repository (or any of the parent directories)." >&2
     exit 4
 fi
 
-# 2. Check if staging area is empty
 if git diff --cached --quiet; then
     echo "ERROR: No staged files found. Please stage your files first." >&2
     exit 5

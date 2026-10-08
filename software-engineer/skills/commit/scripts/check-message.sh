@@ -2,7 +2,6 @@
 
 COMMIT_FILE=""
 
-# Parse arguments
 for arg in "$@"; do
     case $arg in
         --help|-h)

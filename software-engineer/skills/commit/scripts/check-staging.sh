@@ -2,7 +2,6 @@
 
 VERBOSE=0
 
-# Parse arguments
 for arg in "$@"; do
     case $arg in
         --help|-h)
@@ -36,19 +35,16 @@ for arg in "$@"; do
     esac
 done
 
-# 1. Check if inside git work tree
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "ERROR: Not a git repository (or any of the parent directories)." >&2
     exit 4
 fi
 
-# 2. Check if staging area is empty
 if git diff --cached --quiet; then
     echo "ERROR: No staged files found. Please stage your files first." >&2
     exit 2
 fi
 
-# 3. Security Check with gitleaks
 if command -v gitleaks >/dev/null 2>&1; then
     if ! gitleaks git --pre-commit --redact --staged --verbose >&2; then
         echo "ERROR: gitleaks detected exposed secrets. Please review and remove them." >&2
@@ -58,10 +54,8 @@ else
     echo "WARNING: gitleaks is not installed. Skipping automated security scan. Please proceed with manual inspection." >&2
 fi
 
-# 4. Output staged files for agent's manual review
 echo "SUCCESS: Staging area validation passed." >&2
 
-# Output structured data to stdout (with predictable output size)
 STAGED_FILES=$(git -c core.quotepath=false diff --cached --name-only)
 FILE_COUNT=$(echo "$STAGED_FILES" | wc -l | tr -d '[:space:]')
 
