@@ -1,7 +1,6 @@
 ---
 name: commit
 description: Use this skill when the user asks to "commit code", "save changes to git", or "create a commit", or to handle the safe commit workflow.
-compatibility: Requires git. Optional: gitleaks, commitlint.
 ---
 
 # Commit Workflow
