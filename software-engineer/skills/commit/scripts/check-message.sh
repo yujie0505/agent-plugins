@@ -15,15 +15,16 @@ for arg in "$@"; do
             echo ""
             echo "Exit codes:"
             echo "  0: Success"
-            echo "  1: Validation failed"
-            echo "  2: Missing or invalid file argument"
+            echo "  1: Invalid arguments"
+            echo "  4: Missing or invalid commit message file"
+            echo "  5: commitlint validation failed"
             echo "  10: commitlint is not installed (validation skipped)"
             exit 0
             ;;
         -*)
             echo "ERROR: Unexpected option: $arg" >&2
             echo "Usage: scripts/check-message.sh <commit-message-file>" >&2
-            exit 2
+            exit 1
             ;;
         *)
             if [ -z "$COMMIT_FILE" ]; then
@@ -31,7 +32,7 @@ for arg in "$@"; do
             else
                 echo "ERROR: Unexpected argument: $arg" >&2
                 echo "Usage: scripts/check-message.sh <commit-message-file>" >&2
-                exit 2
+                exit 1
             fi
             ;;
     esac
@@ -40,17 +41,17 @@ done
 if [ -z "$COMMIT_FILE" ]; then
     echo "ERROR: Missing commit message file path." >&2
     echo "Usage: scripts/check-message.sh <commit-message-file>" >&2
-    exit 2
+    exit 4
 fi
 
 if [ ! -f "$COMMIT_FILE" ]; then
     echo "ERROR: Commit message file '$COMMIT_FILE' not found." >&2
-    exit 2
+    exit 4
 fi
 
 if [ ! -s "$COMMIT_FILE" ]; then
     echo "ERROR: Commit message file '$COMMIT_FILE' is empty." >&2
-    exit 2
+    exit 4
 fi
 
 if ! command -v commitlint >/dev/null 2>&1; then
@@ -60,7 +61,7 @@ fi
 
 if ! commitlint --edit "$COMMIT_FILE" --default-config >&2; then
     echo "ERROR: commitlint validation failed. Please revise the commit message." >&2
-    exit 1
+    exit 5
 fi
 
 echo "SUCCESS: Commit message validation passed." >&2
