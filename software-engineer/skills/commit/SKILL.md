@@ -11,6 +11,7 @@ description: Use this skill when the user asks to commit staged changes or creat
 - **Scripts as Black Boxes**: Run a script with `--help` to learn its usage, output, and exit codes. Do NOT read the script source unless debugging a failure that its output cannot explain. Act only on the reported output and exit status, not on assumptions about how the script works internally.
 - **Skipped Checks**: If a script reports that a check was skipped, inform the user and compensate with manual review.
 - **No auto-stage**: NEVER run `git add`. Only work with already staged files.
+- **Isolated Subagent Review**: When invoking the `commit-message-reviewer` subagent, pass ONLY the path to the commit message temporary file—NEVER include conversational context, rationale, or explanations in the prompt. On each review iteration, always launch a brand-new `commit-message-reviewer` instance rather than messaging a previous one, ensuring an unpolluted future-reader perspective.
 
 ## Workflow
 
@@ -36,10 +37,15 @@ Progress:
   - Write the subject in the imperative mood, describing what changed.
   - Write the body to explain why the change was made (motivation and context); do not restate the diff.
   - Draft a message and write it to a temporary file in the location used by the agent runtime for conversation temporary files. NEVER write temporary files into the target repository root.
-  - Run `scripts/check-message.sh <path-to-commit-file>` and also validate the draft manually against the repository's conventions.
-    - If the script's findings conflict with the repository's conventions, the repository's conventions take precedence.
-    - Otherwise, revise the draft and re-validate until both checks pass.
-  - Present the valid draft to the user and await EXPLICIT approval. If the user requests changes, update the draft file, re-validate, and seek approval again.
+  - Validate and refine the draft iteratively (up to 3 subagent review rounds):
+    1. **Format & Convention Check**: Run `scripts/check-message.sh <path-to-commit-file>` and validate the draft manually against the repository's conventions. If the script's findings conflict with the repository's conventions, the repository's conventions take precedence. Revise the draft and re-validate until both checks pass.
+    2. **Semantic Review**: Launch a new `commit-message-reviewer` subagent, passing only `<path-to-commit-file>`.
+       - The review passes only when all audit dimensions report `Pass` and no action items (including `Suggestion`) remain.
+       - If any action items are reported:
+         - When the reviewer flags missing motivation ("Why") that cannot be inferred from the codebase, diff, or conversation history, ask the user for the missing rationale before continuing.
+         - Update the draft file to resolve all action items, then repeat from the **Format & Convention Check**.
+       - If action items remain after 3 subagent review rounds, stop iterating and present the latest draft alongside the unresolved review findings to the user.
+  - Present the valid draft to the user and await EXPLICIT approval. If the user requests changes, update the draft file, re-validate with `scripts/check-message.sh <path-to-commit-file>` and the repository's conventions, and seek approval again.
 - [ ] **Step 5: Execute Commit**
   - Run `scripts/create-commit.sh <path-to-commit-file>`.
   - Report success (including the created commit hash), or explain the error if it fails.
