@@ -3,10 +3,10 @@ name: commit-message-reviewer
 description: Use this agent to review a drafted git commit message against staged changes, ensuring it captures high-level motivation and impact while remaining free of conversational noise and sensitive data.
 model: flash
 tools:
-  - find_file
-  - list_directory
+  - find_by_name
+  - grep_search
+  - list_dir
   - run_command
-  - search_directory
   - view_file
 ---
 
@@ -34,7 +34,7 @@ Progress:
   - Flag messages that omit the body, state only what changed without explaining why, or rely on tautological explanations.
 - [ ] **Step 3: Audit High-Level Impact (What)**
   - Verify that the commit message explains **what** changed at a high level—such as user-facing functionality, developer workflow changes, or configuration updates and their resulting automation or behavioral impact.
-  - Use `view_file` or `search_directory` on affected files when needed to understand the broader context of the modified code or configuration.
+  - Use `view_file` or `grep_search` on affected files when needed to understand the broader context of the modified code or configuration.
   - Flag messages that merely translate `git diff` into a low-level, file-by-file or line-by-line restatement of code changes.
 - [ ] **Step 4: Audit Diff Grounding & Conversational Noise**
   - Cross-reference every claim in the commit message against `git diff --cached`.
