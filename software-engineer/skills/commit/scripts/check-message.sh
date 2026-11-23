@@ -7,7 +7,7 @@ for arg in "$@"; do
         --help|-h)
             echo "Usage: scripts/check-message.sh <commit-message-file>"
             echo ""
-            echo "Validates the commit message in the specified file using commitlint."
+            echo "Validates the commit message in the specified file using commitlint (local node_modules or PATH)."
             echo ""
             echo "Output:"
             echo "  - stdout: None"
@@ -54,12 +54,23 @@ if [ ! -s "$COMMIT_FILE" ]; then
     exit 4
 fi
 
-if ! command -v commitlint >/dev/null 2>&1; then
+COMMITLINT_BIN=""
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+
+if [ -x "./node_modules/.bin/commitlint" ]; then
+    COMMITLINT_BIN="./node_modules/.bin/commitlint"
+elif [ -n "$REPO_ROOT" ] && [ -x "$REPO_ROOT/node_modules/.bin/commitlint" ]; then
+    COMMITLINT_BIN="$REPO_ROOT/node_modules/.bin/commitlint"
+elif command -v commitlint >/dev/null 2>&1; then
+    COMMITLINT_BIN="$(command -v commitlint)"
+fi
+
+if [ -z "$COMMITLINT_BIN" ]; then
     echo "WARNING: commitlint is not installed. Skipping automated commitlint validation. Please proceed with manual inspection." >&2
     exit 10
 fi
 
-if ! commitlint --edit "$COMMIT_FILE" --default-config >&2; then
+if ! "$COMMITLINT_BIN" --edit "$COMMIT_FILE" --default-config >&2; then
     echo "ERROR: commitlint validation failed. Please revise the commit message." >&2
     exit 5
 fi

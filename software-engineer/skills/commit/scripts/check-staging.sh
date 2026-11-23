@@ -8,7 +8,7 @@ for arg in "$@"; do
             echo "Checks the git staging area for files and runs security scans (gitleaks)."
             echo ""
             echo "Output:"
-            echo "  - stdout: Line-separated list of staged files."
+            echo "  - stdout: Tab-separated status and path for each staged file (git diff --cached --name-status)."
             echo "  - stderr: Diagnostic messages, warnings, and errors."
             echo ""
             echo "Exit codes:"
@@ -16,7 +16,8 @@ for arg in "$@"; do
             echo "  1: Invalid arguments"
             echo "  2: Not a git repository"
             echo "  3: No staged files found"
-            echo "  5: gitleaks detected exposed secrets"
+            echo "  5: gitleaks scan failed or detected exposed secrets"
+            echo "  10: gitleaks is not installed (security scan skipped; staged file list still written to stdout)"
             exit 0
             ;;
         *)
@@ -37,15 +38,21 @@ if git diff --cached --quiet; then
     exit 3
 fi
 
+SKIPPED=0
+
 if command -v gitleaks >/dev/null 2>&1; then
     if ! gitleaks git --pre-commit --redact --staged --verbose >&2; then
-        echo "ERROR: gitleaks detected exposed secrets. Please review and remove them." >&2
+        echo "ERROR: gitleaks scan failed or detected exposed secrets. Please review the output above." >&2
         exit 5
     fi
+    echo "SUCCESS: Staging area validation passed." >&2
 else
     echo "WARNING: gitleaks is not installed. Skipping automated security scan. Please proceed with manual inspection." >&2
+    SKIPPED=1
 fi
 
-echo "SUCCESS: Staging area validation passed." >&2
+git -c core.quotepath=false diff --cached --name-status
 
-git -c core.quotepath=false diff --cached --name-only
+if [ "$SKIPPED" -eq 1 ]; then
+    exit 10
+fi
