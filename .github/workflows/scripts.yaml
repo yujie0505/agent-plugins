@@ -1,0 +1,38 @@
+name: Script Linting
+run-name: Script Linting run by @${{ github.actor }} on ${{ github.ref_name }}
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/scripts.yaml"
+      - ".shellcheckrc"
+      - "**/*.sh"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/scripts.yaml"
+      - ".shellcheckrc"
+      - "**/*.sh"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  shellcheck:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Run ShellCheck
+        run: |
+          shellcheck --version
+          find . -path './.git' -prune -o -type f -name '*.sh' -exec shellcheck {} +
