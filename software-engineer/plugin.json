@@ -1,3 +1,7 @@
 {
-  "name": "software-engineer"
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "software-engineer",
+  "displayName": "Software Engineer",
+  "version": "1.0.0",
+  "description": "Personal software engineering workflows for staged code reviews, convention-aligned git commits, and post-commit retrospectives."
 }
